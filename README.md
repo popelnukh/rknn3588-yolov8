@@ -1,38 +1,36 @@
+We integrated the yolov8 example from the rknn_model_zoo based on https://github.com/leafqycc/rknn-multi-threaded, rewrote the post-processing function with GitHub Copilot, and removed the dependency on PyTorch.
 
-我们在https://github.com/leafqycc/rknn-multi-threaded的基础上，对rknn_model_zoo中的yolov8 example进行了整合，用github copilot重写了后处理函数，取消了pytorch依赖。
+# Introduction
+* Utilizes multi-threaded asynchronous operations on the rknn model to increase the NPU utilization of RK3588/RK3588s, thereby improving inference frame rates (it should also work on devices like RK3568 after modification, but the author does not have an RK3568 development board).
+* This branch uses the model [yolov5s_relu_tk2_RK3588_i8.rknn](https://github.com/airockchip/rknn_model_zoo), which replaces the silu activation function in the yolov5s model with relu, achieving significant performance improvement at the cost of slight accuracy loss. For more details, see [rknn_model_zoo](https://github.com/airockchip/rknn_model_zoo/tree/main/models/CV/object_detection/yolo).
+* The C++ implementation of this project can be found [here](https://github.com/leafqycc/rknn-cpp-Multithreading).
 
+# Update Notes
+* None
 
-# 简介
-* 使用多线程异步操作rknn模型, 提高rk3588/rk3588s的NPU使用率, 进而提高推理帧数(rk3568之类修改后应该也能使用, 但是作者本人并没有rk3568开发板......)
-* 此分支使用模型[yolov5s_relu_tk2_RK3588_i8.rknn](https://github.com/airockchip/rknn_model_zoo), 将yolov5s模型的激活函数silu修改为为relu,在损失一点精度的情况下获得较大性能提升,详情见于[rknn_model_zoo](https://github.com/airockchip/rknn_model_zoo/tree/main/models/CV/object_detection/yolo)
-* 此项目的[c++](https://github.com/leafqycc/rknn-cpp-Multithreading)实现
+# Instructions
+### Demonstration
+* Clone the repository to your local machine, place the demo video from Releases in the root directory of the project, and run main.py to see the demo example.
+* Switch to root user and run performance.sh to perform frequency operation (equivalent to enabling performance mode).
+* Run rkcat.sh to check the current temperature and NPU utilization.
 
-# 更新说明
-* 无
+### Application Deployment
+* Modify the modelPath in main.py to the path of your model.
+* Modify the cap in main.py to the video/camera you want to run.
+* Modify the TPEs in main.py to the number of threads you want, referring to the table below.
+* Modify func.py to your required inference function, see the myFunc function for details.
 
+# Multi-threaded Model Frame Rate Test
+* Use performance.sh to perform CPU/NPU frequency setting to minimize error.
+* The test model is [yolov5s_relu_tk2_RK3588_i8.rknn](https://github.com/airockchip/rknn_model_zoo).
+* Test video can be found in Releases.
 
-# 使用说明
-### 演示
-  * 将仓库拉取至本地, 并将Releases中的演示视频放于项目根目录下, 运行main.py查看演示示例
-  * 切换至root用户运行performance.sh可以进行定频操作(约等于开启性能模式)
-  * 运行rkcat.sh可以查看当前温度与NPU占用
-### 部署应用
-  * 修改main.py下的modelPath为你自己的模型所在路径
-  * 修改main.py下的cap为你想要运行的视频/摄像头
-  * 修改main.py下的TPEs为你想要的线程数, 具体可参考下表
-  * 修改func.py为你自己需要的推理函数, 具体可查看myFunc函数
-
-# 多线程模型帧率测试
-* 使用performance.sh进行CPU/NPU定频尽量减少误差
-* 测试模型为[yolov5s_relu_tk2_RK3588_i8.rknn](https://github.com/airockchip/rknn_model_zoo)
-* 测试视频见于Releases
-
-|  模型\线程数   | 1    |  2   | 3  |  4  | 5  | 6  |
-|  ----  | ----    | ----  |  ----  | ----  | ----  | ----  |
+| Model\Threads | 1    |  2   | 3  |  4  | 5  | 6  |
+| ----  | ----    | ----  |  ----  | ----  | ----  | ----  |
 | yolov5s  | 27.4491 | 49.0747 | 65.3673  | 63.3204 | 71.8407 | 72.0590 |
 
-# 补充
-* 多线程下CPU, NPU占用较高, **核心温度相应增高**, 请做好散热。推荐开1, 2, 3线程, 实测小铜片散热下运行三分钟温度约为56°, 64°, 69°
+# Additional Notes
+* Under multi-threading, CPU and NPU usage are high, and **core temperature increases accordingly**, so please ensure proper cooling. It is recommended to use 1, 2, or 3 threads. Testing with a small copper piece for cooling showed temperatures of approximately 56°C, 64°C, and 69°C after running for three minutes.
 
 # Acknowledgements
 * https://github.com/ultralytics/yolov5

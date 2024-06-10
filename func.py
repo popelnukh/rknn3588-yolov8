@@ -15,7 +15,10 @@ OBJ_THRESH, NMS_THRESH, IMG_SIZE = 0.25, 0.45, 640
 
 # CLASSES = ('tank', 'btr', 'btr broken', 'bmp', 'bmp broken', 'mlrs grad', 'army truck', 'soldier', 'corpse', 'z', 'hatch')
 
-CLASSES = ('BMP-BMD', 'BTR', 'KAMAZ', 'MTLB', 'RLS', 'RSZO', 'SAU', 'TANK', 'URAL', 'ZRK')
+# CLASSES = ('BMP-BMD', 'BTR', 'KAMAZ', 'MTLB', 'RLS', 'RSZO', 'SAU', 'TANK', 'URAL', 'ZRK')
+
+# CLASSES = ('cup', 'box')
+CLASSES = ('bucket', 'box', 'ball')
 
 def filter_boxes(boxes, box_confidences, box_class_probs):
     """Filter boxes with object threshold.
@@ -101,9 +104,24 @@ def dfl(position):
     y = position.reshape(n,p_num,mc,h,w)
     
     # Vectorized softmax
-    e_y = np.exp(y - np.max(y, axis=2, keepdims=True))  # subtract max for numerical stability
-    y = e_y / np.sum(e_y, axis=2, keepdims=True)
+    #e_y = np.exp(y - np.max(y, axis=2, keepdims=True))  # subtract max for numerical stability
+    # max_value = np.max(y, axis=2, keepdims=True)
+    # e_y = np.exp(y - max_value)  
+    # y = e_y / np.sum(e_y, axis=2, keepdims=True)
+
+
+    # Vectorized softmax
+    max_value = np.max(y, axis=2, keepdims=True)
+    e_y = np.exp(y - max_value)
     
+    # Avoid division by zero
+    sum_e_y = np.sum(e_y, axis=2, keepdims=True)
+    sum_e_y[sum_e_y == 0] = 1  # Replace zeros with ones to avoid division by zero
+    
+    y = e_y / sum_e_y
+    
+
+
     acc_metrix = np.arange(mc).reshape(1,1,mc,1,1)
     y = (y*acc_metrix).sum(2)
     return y

@@ -16,9 +16,9 @@ print("base_dir:", base_dir)
 parser = argparse.ArgumentParser(description='Process some integers.')
 # # basic params
 # parser.add_argument('--model_path', type=str, default='./model/yolov8n.rknn', help='model path, could be .pt or .rknn file')
-parser.add_argument('--model_path', type=str, default='rknnModel/bird_1_3.rknn', help='model path, could be .pt or .rknn file')
+parser.add_argument('--model_path', type=str, default='rknnModel/bucket_box_ball_epochs_100.rknn', help='model path, could be .pt or .rknn file')
 parser.add_argument('--target', type=str, default='rk3588', help='target RKNPU platform')
-parser.add_argument('--video_path', type=str, default='video/004.mp4', help='video path for inference')
+parser.add_argument('--video_path', type=str, default='video/20240606_160328.mp4', help='video path for inference')
     
 
 args = parser.parse_args()
@@ -36,7 +36,7 @@ cap = cv2.VideoCapture(video_path)
 model_path = os.path.join(base_dir, args.model_path)
 
 # Number of threads, increasing this can improve the frame rate
-TPEs = 6
+TPEs = 4
 # Initialize the rknn pool
 pool = rknnPoolExecutor(
     rknnModel=model_path,
